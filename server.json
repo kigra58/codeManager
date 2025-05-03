@@ -2,13 +2,21 @@
   "users": [
     {
       "id": 1,
+      "name": "admin",
       "email": "admin@admin.com",
       "password": "admin@123"
     },
     {
       "id": 2,
+      "name": "user",
       "email": "user@user.com",
       "password": "user@123"
+    },
+    {
+      "id": 240,
+      "name": "john",
+      "email": "john@gmail.com",
+      "password": "Test@123"
     }
   ]
 }

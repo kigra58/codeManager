@@ -3,12 +3,12 @@ import { View, Text, StyleSheet, TextInput, TouchableOpacity } from 'react-nativ
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
-import { loginService } from '../../services/authService';
 import { loginSchema } from '../../validations/authValidation';
 import { useAuth } from '../../contexts/AuthContext';
 import Toast from 'react-native-toast-message';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { ROUTES } from '../../routes/routes';
+import { getUserByEmailService } from '../../services/userService';
 
 type LoginForm = z.infer<typeof loginSchema>;
 interface LoginScreenProps {
@@ -23,8 +23,10 @@ const LoginScreen:React.FC<LoginScreenProps> = ({navigation}) => {
 
   const onSubmit = async (data: LoginForm) => {
     try {
-      const res = await loginService(data.email, data.password);
-      if (res.length > 0) {
+     const res = await getUserByEmailService(data.email);
+
+     console.log("User by email",res);
+      if (res) {
         login(res);
         Toast.show({ type: 'success', text1: 'Login Successful' });
       } else {

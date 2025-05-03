@@ -10,7 +10,7 @@ const Splash: React.FC = () => {
         style={styles.logo}
         resizeMode="contain"
       /> */}
-      <Text style={styles.title}>Welcome to Splash Screen</Text>
+      <Text style={styles.title}>Welcome</Text>
       <ActivityIndicator size="large" color="#0f4c81" style={styles.loader} />
       <Text style={styles.subtitle}>Loading, please wait...</Text>
     </View>

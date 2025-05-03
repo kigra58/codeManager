@@ -14,6 +14,8 @@ export const loginSchema = z.object({
 });
 
 export const signupSchema = z.object({
+  name: z
+    .string({ required_error: validationMessageHandler("Name", "emptyField") }),
   email: z
     .string({ required_error: validationMessageHandler("Email", "emptyField") })
     .email(validationMessageHandler("Email", "invalidField")),

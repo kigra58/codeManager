@@ -5,9 +5,9 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import Toast from 'react-native-toast-message';
 import { z } from 'zod';
 import { signupSchema } from '../../validations/authValidation';
-import { signupService } from '../../services/authService';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { ROUTES } from '../../routes/routes';
+import { createNewUserService, getUserByEmailService } from '../../services/userService';
 
 type SignupForm = z.infer<typeof signupSchema>;
 
@@ -22,14 +22,20 @@ const SignupScreen:React.FC<SignupScreenProps> = ({ navigation }) => {
 
   const onSubmit = async (data: SignupForm) => {
     try {
-      const res = await signupService(data.email, data.password);
-      console.log("Signup response",res);
-      if (res.length > 0) {
+      // const res = await signupService(data.email, data.password);
+      const exisUser=await getUserByEmailService(data.email);
+      if(exisUser.length>0){
         Toast.show({ type: 'error', text1: 'User already exists' });
         return;
       }
-      Toast.show({ type: 'success', text1: 'Signup Successful' });
-      navigation.navigate(ROUTES.LOGIN);
+      const res = await createNewUserService(data);
+      console.log("Signup response==========>",res);
+      if (res.status === 201) {
+        Toast.show({ type: 'success', text1: 'Signup successfully' });
+        navigation.navigate(ROUTES.LOGIN);
+      }else{
+      Toast.show({ type: 'error', text1: 'Signup failed' });
+      }
     } catch (err) {
       Toast.show({ type: 'error', text1: 'Signup failed' });
     }
@@ -38,6 +44,12 @@ const SignupScreen:React.FC<SignupScreenProps> = ({ navigation }) => {
   return (
     <View style={styles.container}>
       <Text style={styles.title}>Sign Up</Text>
+      <TextInput
+        style={styles.input}
+        placeholder="Name"
+        autoCapitalize="none"
+        onChangeText={text => setValue('name', text)}
+      />
       <TextInput
         style={styles.input}
         placeholder="Email"
