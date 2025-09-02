@@ -7,7 +7,7 @@ import SplashScreen from '../screens/Splash/Splash';
 import { useAuth } from '../contexts/AuthContext';
 import LoginScreen from '../screens/Auth/LoginScreen';
 import SignupScreen from '../screens/Auth/SignupScreen';
-import { HomeScreen, ProfileScreen } from '../screens/HomeScreen';
+
 import { RootStackParamList } from '../utils/interfaces';
 import { ROUTES } from '../routes/routes';
 
