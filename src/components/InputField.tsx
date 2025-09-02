@@ -1,7 +1,7 @@
 import React from "react";
 import { Text, TextInput, View, TextInputProps } from "react-native";
 import { Controller } from "react-hook-form";
-import type { Control, FieldErrors } from "react-hook-form";
+import type { Control } from "react-hook-form";
 
 interface InputFieldProps extends Omit<TextInputProps, "value" | "onChangeText"> {
   label: string;

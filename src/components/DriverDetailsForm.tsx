@@ -1,6 +1,4 @@
 import { View } from "react-native";
-
-
 import InputField from "./InputField";
 import { Control, FieldErrors } from "react-hook-form";
 

@@ -1,9 +1,5 @@
-
-
-
 import React from "react";
 import { View, Text } from "react-native";
-
 import type { Control, FieldErrors } from "react-hook-form";
 import InputField from "./InputField";
 
