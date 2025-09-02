@@ -1,24 +1,35 @@
 
 import React from "react";
-import { View, Text, Switch } from "react-native";
-import type { FormType } from "../utils/interfaces";
+import { View, Text } from "react-native";
+import CheckBox from "@react-native-community/checkbox";
+import { Controller } from "react-hook-form";
+import type { Control, FieldErrors } from "react-hook-form";
 
-interface DeclarationProps {
-  form: FormType;
-  setForm: React.Dispatch<React.SetStateAction<FormType>>;
-}
+type DeclarationProps = {
+  control: Control<any>;
+  errors: FieldErrors<any>;
+};
 
-export default function Declaration({ form, setForm }: DeclarationProps) {
+
+export default function Declaration({ control, errors }: DeclarationProps) {
   return (
-    <View style={{ marginBottom: 20 }}>
-      <Text style={{ fontWeight: "bold", fontSize: 16 }}>Declaration</Text>
-      <Switch
-        value={form.declaration}
-        onValueChange={(val: boolean) => setForm({ ...form, declaration: val })}
-      />
-      <Text style={{ fontSize: 12, marginTop: 5 }}>
-        I hereby declare that all details are correct and genuine.
-      </Text>
-    </View>
+    <Controller
+      control={control}
+      name="declaration"
+      render={({ field: { onChange, value } }) => (
+        <View style={{ flexDirection: "row", alignItems: "center", marginBottom: 20 }}>
+          <CheckBox
+            value={!!value}
+            onValueChange={onChange}
+          />
+          <Text style={{ marginLeft: 8 }}>
+            I hereby declare that the information provided is true and correct.
+          </Text>
+          {errors.declaration?.message && typeof errors.declaration.message === "string" && (
+            <Text style={{ color: "red", marginLeft: 8 }}>{errors.declaration.message}</Text>
+          )}
+        </View>
+      )}
+    />
   );
 }

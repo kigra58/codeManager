@@ -1,39 +1,38 @@
+import { View } from "react-native";
 
-import React from "react";
-import { View, Text, TextInput } from "react-native";
-import type { FormType } from "../utils/interfaces";
+
+import InputField from "./InputField";
 
 interface DriverDetailsFormProps {
-  form: FormType;
-  setForm: React.Dispatch<React.SetStateAction<FormType>>;
+  control: any;
+  errors: any;
 }
 
-export default function DriverDetailsForm({ form, setForm }: DriverDetailsFormProps) {
+export default function DriverDetailsForm({ control, errors }: DriverDetailsFormProps) {
   return (
     <View style={{ marginBottom: 20 }}>
-      <Text style={{ fontWeight: "bold", fontSize: 16 }}>Driver Details</Text>
-
-      <Text>Driver Name *</Text>
-      <TextInput
-        style={{ borderWidth: 1, padding: 10, marginBottom: 10 }}
-        value={form.driverName}
-  onChangeText={(val: string) => setForm({ ...form, driverName: val })}
+      <InputField
+        label="Driver Name"
+        required
+        name="driverName"
+        control={control}
+        error={errors.driverName?.message}
       />
-
-      <Text>Email *</Text>
-      <TextInput
-        style={{ borderWidth: 1, padding: 10, marginBottom: 10 }}
+      <InputField
+        label="Email"
+        required
+        name="driverEmail"
+        control={control}
         keyboardType="email-address"
-        value={form.driverEmail}
-  onChangeText={(val: string) => setForm({ ...form, driverEmail: val })}
+        error={errors.driverEmail?.message}
       />
-
-      <Text>Phone *</Text>
-      <TextInput
-        style={{ borderWidth: 1, padding: 10, marginBottom: 10 }}
+      <InputField
+        label="Phone"
+        required
+        name="driverPhone"
+        control={control}
         keyboardType="phone-pad"
-        value={form.driverPhone}
-  onChangeText={(val: string) => setForm({ ...form, driverPhone: val })}
+        error={errors.driverPhone?.message}
       />
     </View>
   );

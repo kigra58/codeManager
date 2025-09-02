@@ -1,41 +1,43 @@
+
+
+
 import React from "react";
-import { View, Text, TextInput } from "react-native";
+import { View, Text } from "react-native";
 
+import type { Control, FieldErrors } from "react-hook-form";
+import InputField from "./InputField";
 
-import type { FormType } from "../utils/interfaces";
+type TripInfoFormProps = {
+  control: Control<any>;
+  errors: FieldErrors<any>;
+};
 
-interface TripInfoFormProps {
-  form: FormType;
-  setForm: React.Dispatch<React.SetStateAction<FormType>>;
-}
-
-export default function TripInfoForm({ form, setForm }: TripInfoFormProps) {
+export default function TripInfoForm({ control, errors }: TripInfoFormProps) {
   return (
     <View style={{ marginBottom: 20 }}>
       <Text style={{ fontWeight: "bold", fontSize: 16 }}>Trip Information</Text>
-
-      <Text>Vehicle Number *</Text>
-      <TextInput
-        style={{ borderWidth: 1, padding: 10, marginBottom: 10 }}
+      <InputField
+        label="Vehicle Number"
+        required
+        name="vehicleNumber"
+        control={control}
         placeholder="Enter vehicle number"
-        value={form.vehicleNumber}
-        onChangeText={(val) => setForm({ ...form, vehicleNumber: val })}
+        error={typeof errors.vehicleNumber?.message === "string" ? errors.vehicleNumber.message : undefined}
       />
-
-      <Text>Entry Date & Time *</Text>
-      <TextInput
-        style={{ borderWidth: 1, padding: 10, marginBottom: 10 }}
+      <InputField
+        label="Entry Date & Time"
+        required
+        name="entryDate"
+        control={control}
         placeholder="YYYY-MM-DD HH:mm"
-        value={form.entryDate}
-        onChangeText={(val) => setForm({ ...form, entryDate: val })}
+        error={typeof errors.entryDate?.message === "string" ? errors.entryDate.message : undefined}
       />
-
-      <Text>Exit Date & Time</Text>
-      <TextInput
-        style={{ borderWidth: 1, padding: 10 }}
+      <InputField
+        label="Exit Date & Time"
+        name="exitDate"
+        control={control}
         placeholder="YYYY-MM-DD HH:mm"
-        value={form.exitDate}
-        onChangeText={(val) => setForm({ ...form, exitDate: val })}
+        error={typeof errors.exitDate?.message === "string" ? errors.exitDate.message : undefined}
       />
     </View>
   );

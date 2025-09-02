@@ -1,75 +1,83 @@
-import React, { useState } from "react";
-import { ScrollView, SafeAreaView, Alert } from "react-native";
-import TripInfoForm from "./TripInfo";
-import DocumentUpload from "./DocumentUpload";
-import DriverDetailsForm from "./DriverDetailsForm";
-import Declaration from "./Declaration";
-import FormActions from "./FormAction";
-import Timer from "./Timer";
+import React from 'react';
+import {ScrollView, SafeAreaView, Alert, Text} from 'react-native';
+import TripInfoForm from './TripInfo';
+import DocumentUpload from './DocumentUpload';
+import DriverDetailsForm from './DriverDetailsForm';
+import Declaration from './Declaration';
+import FormActions from './FormAction';
+import Timer from './Timer';
+import {useForm} from 'react-hook-form';
+import {zodResolver} from '@hookform/resolvers/zod';
+import {z} from 'zod';
+import {registerTripSchema} from '../schema/registerTripSchema';
 
+type TripFormType = z.infer<typeof registerTripSchema>;
 
-type FormType = {
-  vehicleNumber: string;
-  entryDate: string;
-  exitDate: string;
-  rcDoc: string;
-  pucDoc: string;
-  insuranceDoc: string;
-  driverName: string;
-  driverEmail: string;
-  driverPhone: string;
-  declaration: boolean;
-};
-
-export default function App() {
-  const [form, setForm] = useState<FormType>({
-    vehicleNumber: "",
-    entryDate: "",
-    exitDate: "",
-    rcDoc: "",
-    pucDoc: "",
-    insuranceDoc: "",
-    driverName: "",
-    driverEmail: "",
-    driverPhone: "",
-    declaration: false,
+export default function TripRegister() {
+  const {
+    control,
+    handleSubmit,
+    reset,
+    formState: {errors},
+  } = useForm<TripFormType>({
+    resolver: zodResolver(registerTripSchema),
+    defaultValues: {
+      vehicleNumber: '',
+      entryDate: '',
+      exitDate: '',
+      rcDoc: '',
+      pucDoc: '',
+      insuranceDoc: '',
+      driverName: '',
+      driverEmail: '',
+      driverPhone: '',
+      declaration: false,
+    },
   });
 
-  const handleSubmit = () => {
-    if (!form.declaration) {
-      Alert.alert("Declaration Required", "You must agree to the declaration");
-      return;
-    }
-    console.log("Form submitted:", form);
-    Alert.alert("Success", "Trip Registered Successfully!");
+  const onSubmit = (data: TripFormType) => {
+    console.log('Form submitted:', data);
+    Alert.alert('Success', 'Trip Registered Successfully!');
+    reset();
   };
 
-  const handleClear = () => {
-    setForm({
-      vehicleNumber: "",
-      entryDate: "",
-      exitDate: "",
-      rcDoc: "",
-      pucDoc: "",
-      insuranceDoc: "",
-      driverName: "",
-      driverEmail: "",
-      driverPhone: "",
-      declaration: false,
-    });
+  const onClear = () => {
+    reset();
   };
 
+  // Pass form props to children: register, setValue, watch, errors
   return (
-    <SafeAreaView style={{ flex: 1, padding: 20 }}>
+    <SafeAreaView style={{flex: 1, padding: 20}}>
       <ScrollView>
         <Timer />
-        <TripInfoForm form={form} setForm={setForm} />
-        <DocumentUpload title="Registration Certificate (RC)" field="rcDoc" form={form} setForm={setForm} />
-        <DocumentUpload title="Pollution Under Control (PUC)" field="pucDoc" form={form} setForm={setForm} />
-        <DocumentUpload title="Insurance Certificate" field="insuranceDoc" form={form} setForm={setForm} />
-        <DriverDetailsForm form={form} setForm={setForm} />
-        <Declaration form={form} setForm={setForm} />
-        <FormActions onClear={handleClear} onSubmit={handleSubmit} />
+        <TripInfoForm control={control} errors={errors} />
+        <DocumentUpload
+          title="Registration Certificate (RC)"
+          field="rcDoc"
+          control={control}
+          errors={errors}
+        />
+        <DocumentUpload
+          title="Pollution Under Control (PUC)"
+          field="pucDoc"
+          control={control}
+          errors={errors}
+        />
+        <DocumentUpload
+          title="Insurance Certificate"
+          field="insuranceDoc"
+          control={control}
+          errors={errors}
+        />
+        <DriverDetailsForm control={control} errors={errors} />
+        <Declaration control={control} errors={errors} />
+        <FormActions onClear={onClear} onSubmit={handleSubmit(onSubmit)} />
+        {/* Show top-level errors if needed */}
+        {errors.declaration && (
+          <Text style={{color: 'red', marginTop: 8}}>
+            {errors.declaration.message}
+          </Text>
+        )}
       </ScrollView>
     </SafeAreaView>
   );

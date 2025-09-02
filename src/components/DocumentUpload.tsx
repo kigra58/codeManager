@@ -1,37 +1,27 @@
+import { View, Text } from "react-native";
 
-import React from "react";
-import { View, Text, Button } from "react-native";
-import DocumentPicker, { types as DocumentPickerTypes } from "react-native-document-picker";
-import type { FormType } from "../utils/interfaces";
+// ...existing code...
+
+// ...existing code...
+import InputField from "./InputField";
 
 interface DocumentUploadProps {
   title: string;
-  field: keyof FormType;
-  form: FormType;
-  setForm: React.Dispatch<React.SetStateAction<FormType>>;
+  field: string;
+  control: any;
+  errors: any;
 }
 
-export default function DocumentUpload({ title, field, form, setForm }: DocumentUploadProps) {
-  const pickFile = async () => {
-    try {
-      const result = await DocumentPicker.pick({ type: [DocumentPickerTypes.images] });
-      if (result && result[0]?.uri) {
-        setForm({ ...form, [field]: result[0].uri });
-      }
-    } catch (err) {
-      if (DocumentPicker.isCancel(err)) {
-        // User cancelled the picker
-      } else {
-        console.error(err);
-      }
-    }
-  };
-
+export default function DocumentUpload({ title, field, control, errors }: DocumentUploadProps) {
   return (
     <View style={{ marginBottom: 20 }}>
-      <Text style={{ fontWeight: "bold" }}>{title} *</Text>
-      <Button title="Upload File" onPress={pickFile} />
-  {typeof form[field] === "string" && form[field] && <Text>📂 {form[field]}</Text>}
+      <InputField
+        label={title}
+        required
+        name={field}
+        control={control}
+        error={errors[field]?.message}
+      />
     </View>
   );
 }
