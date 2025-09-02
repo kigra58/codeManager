@@ -1,15 +1,12 @@
-import { View, Text } from "react-native";
-
-// ...existing code...
-
-// ...existing code...
+import { View } from "react-native";
 import InputField from "./InputField";
+import { Control, FieldErrors } from "react-hook-form";
 
 interface DocumentUploadProps {
   title: string;
   field: string;
-  control: any;
-  errors: any;
+  control: Control<any>;
+  errors: FieldErrors<any>;
 }
 
 export default function DocumentUpload({ title, field, control, errors }: DocumentUploadProps) {
@@ -20,7 +17,7 @@ export default function DocumentUpload({ title, field, control, errors }: Docume
         required
         name={field}
         control={control}
-        error={errors[field]?.message}
+        error={typeof errors[field]?.message === "string" ? errors[field]?.message : undefined}
       />
     </View>
   );

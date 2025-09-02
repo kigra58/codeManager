@@ -2,10 +2,11 @@ import { View } from "react-native";
 
 
 import InputField from "./InputField";
+import { Control, FieldErrors } from "react-hook-form";
 
 interface DriverDetailsFormProps {
-  control: any;
-  errors: any;
+  control: Control<any>;
+  errors: FieldErrors<any>;
 }
 
 export default function DriverDetailsForm({ control, errors }: DriverDetailsFormProps) {
@@ -16,7 +17,7 @@ export default function DriverDetailsForm({ control, errors }: DriverDetailsForm
         required
         name="driverName"
         control={control}
-        error={errors.driverName?.message}
+        error={typeof errors.driverName?.message === "string" ? errors.driverName.message : undefined}
       />
       <InputField
         label="Email"
@@ -24,7 +25,7 @@ export default function DriverDetailsForm({ control, errors }: DriverDetailsForm
         name="driverEmail"
         control={control}
         keyboardType="email-address"
-        error={errors.driverEmail?.message}
+        error={typeof errors.driverEmail?.message === "string" ? errors.driverEmail.message : undefined}
       />
       <InputField
         label="Phone"
@@ -32,7 +33,7 @@ export default function DriverDetailsForm({ control, errors }: DriverDetailsForm
         name="driverPhone"
         control={control}
         keyboardType="phone-pad"
-        error={errors.driverPhone?.message}
+        error={typeof errors.driverPhone?.message === "string" ? errors.driverPhone.message : undefined}
       />
     </View>
   );
