@@ -4,12 +4,8 @@ import { theme } from '../theme/theme';
 import Timer from './Timer';
 import { TripFormProvider } from '../contexts/FormContext';
 import { useFormContext } from '../contexts/FormContext';
-import Step1TripInfo from './FormSteps/Step1TripInfo';
-import Step2Documents from './FormSteps/Step2Documents';
-import Step3DriverDetails from './FormSteps/Step3DriverDetails';
-import Step4Declaration from './FormSteps/Step4Declaration';
-import Step5Review from './FormSteps/Step5Review';
 import StepNavigation from './FormSteps/StepNavigation';
+import { FORM_STEPS } from '../utils/constant';
 
 export default function TripRegister() {
   return (
@@ -24,20 +20,8 @@ function TripRegisterContent() {
 
   // Render the current step
   const renderStep = () => {
-    switch (currentStep) {
-      case 1:
-        return <Step1TripInfo />;
-      case 2:
-        return <Step2Documents />;
-      case 3:
-        return <Step3DriverDetails />;
-      case 4:
-        return <Step4Declaration />;
-      case 5:
-        return <Step5Review />;
-      default:
-        return <Step1TripInfo />;
-    }
+    const step = FORM_STEPS.find((s) => s.id === currentStep);
+    return step ? React.createElement(step.component) : null;
   };
 
   return (

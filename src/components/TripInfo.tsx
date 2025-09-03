@@ -1,14 +1,11 @@
 import React from "react";
 import { View, Text } from "react-native";
-import type { Control, FieldErrors } from "react-hook-form";
+import { useForm  } from "react-hook-form";
 import InputField from "./InputField";
 
-type TripInfoFormProps = {
-  control: Control<any>;
-  errors: FieldErrors<any>;
-};
 
-export default function TripInfoForm({ control, errors }: TripInfoFormProps) {
+export default function TripInfoForm() {
+  const { control, formState: { errors } } = useForm();
   return (
     <View style={{ marginBottom: 20 }}>
       <Text style={{ fontWeight: "bold", fontSize: 16 }}>Trip Information</Text>

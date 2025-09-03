@@ -2,16 +2,13 @@
 import React from "react";
 import { View, Text } from "react-native";
 import CheckBox from "@react-native-community/checkbox";
-import { Controller } from "react-hook-form";
-import type { Control, FieldErrors } from "react-hook-form";
-
-type DeclarationProps = {
-  control: Control<any>;
-  errors: FieldErrors<any>;
-};
+import { Controller, useForm } from "react-hook-form";
 
 
-export default function Declaration({ control, errors }: DeclarationProps) {
+
+
+export default function Declaration() {
+  const { control, formState: { errors } } = useForm();
   return (
     <Controller
       control={control}

@@ -69,7 +69,7 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.1,
     shadowRadius: 3,
     elevation: 2,
-    height: 56, // Increased height for modern look
+    height: 56, 
   },
   inputError: {
     borderColor: theme.colors.danger,

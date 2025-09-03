@@ -1,13 +1,10 @@
 import { View } from "react-native";
 import InputField from "./InputField";
-import { Control, FieldErrors } from "react-hook-form";
+import { useForm } from "react-hook-form";
 
-interface DriverDetailsFormProps {
-  control: Control<any>;
-  errors: FieldErrors<any>;
-}
 
-export default function DriverDetailsForm({ control, errors }: DriverDetailsFormProps) {
+export default function DriverDetailsForm() {
+  const { control, formState: { errors } } = useForm();
   return (
     <View style={{ marginBottom: 20 }}>
       <InputField
