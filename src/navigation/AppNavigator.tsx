@@ -10,6 +10,7 @@ import SignupScreen from '../screens/Auth/SignupScreen';
 
 import { RootStackParamList } from '../utils/interfaces';
 import { ROUTES } from '../routes/routes';
+import TripRegister from '../components/TripRegister';
 
 
 
@@ -32,14 +33,15 @@ const AppNavigator:React.FC = () => {
   return (
     <NavigationContainer>
       <Stack.Navigator>
-        {user ? (
+        {/* {user ? (
           <Stack.Screen name={ROUTES.DASHBOARD} component={DashboardScreen} options={{ headerShown: false }} />
         ) : (
           <>
             <Stack.Screen name={ROUTES.LOGIN} component={LoginScreen} options={{ headerShown: false }} />
             <Stack.Screen name={ROUTES.SIGNUP} component={SignupScreen} options={{ headerShown: false }} />
           </>
-        )}
+        )} */}
+  <Stack.Screen name="TripRegister" component={TripRegister} options={{ headerShown: false }} />
       </Stack.Navigator>
     </NavigationContainer>
   );

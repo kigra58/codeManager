@@ -16,4 +16,5 @@ export type RootStackParamList = {
   Dashboard: undefined;
   Home: undefined;
   Profile: undefined;
+  TripRegister: undefined;
 };
