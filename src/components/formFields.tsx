@@ -1,14 +1,21 @@
 import React from "react";
 import InputField from "./InputField";
+import type { Control, FieldErrors } from "react-hook-form";
 
-export const getDriverFormFields = ({ control, errors }: any) => [
+
+interface DriverFormFieldsProps {
+  control: Control<any>;
+  errors: FieldErrors<any>;
+}
+
+export const getDriverFormFields = ({ control, errors }: DriverFormFieldsProps) => [
   <InputField
     key="driverName"
     label="Driver Name"
     required
     name="driverName"
     control={control}
-    error={errors.driverName?.message}
+    error={typeof errors.driverName?.message === "string" ? errors.driverName.message : undefined}
   />,
   <InputField
     key="driverEmail"
@@ -17,7 +24,7 @@ export const getDriverFormFields = ({ control, errors }: any) => [
     name="driverEmail"
     control={control}
     keyboardType="email-address"
-    error={errors.driverEmail?.message}
+    error={typeof errors.driverEmail?.message === "string" ? errors.driverEmail.message : undefined}
   />,
   <InputField
     key="driverPhone"
@@ -26,6 +33,6 @@ export const getDriverFormFields = ({ control, errors }: any) => [
     name="driverPhone"
     control={control}
     keyboardType="phone-pad"
-    error={errors.driverPhone?.message}
+    error={typeof errors.driverPhone?.message === "string" ? errors.driverPhone.message : undefined}
   />
 ];
