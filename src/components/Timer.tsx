@@ -1,26 +1,42 @@
-import React, { useEffect, useState } from "react";
-import { View, Text } from "react-native";
+import React from "react";
+import { View, Text, StyleSheet } from "react-native";
+import { useFormContext } from "../contexts/FormContext";
+import { theme } from "../theme/theme";
 
 export default function Timer() {
-  const [timeLeft, setTimeLeft] = useState(15 * 60); // 15 minutes in seconds
-
-  useEffect(() => {
-    if (timeLeft <= 0) return;
-    const interval = setInterval(() => {
-      setTimeLeft((prev) => prev - 1);
-    }, 1000);
-    return () => clearInterval(interval);
-  }, [timeLeft]);
+  const { timeLeft } = useFormContext();
 
   const minutes = Math.floor(timeLeft / 60);
   const seconds = timeLeft % 60;
 
   return (
-    <View style={{ padding: 10, backgroundColor: "#fff", borderRadius: 8 }}>
-      <Text style={{ fontWeight: "bold", color: "#0d6efd" }}>
+    <View style={styles.container}>
+      <Text style={styles.text}>
         Time Remaining: {minutes.toString().padStart(2, "0")}:
         {seconds.toString().padStart(2, "0")}
       </Text>
     </View>
   );
 }
+
+const styles = StyleSheet.create({
+  container: {
+    padding: theme.spacing.md,
+    backgroundColor: theme.colors.light,
+    borderRadius: theme.borderRadius.md,
+    marginBottom: theme.spacing.md,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    shadowColor: theme.colors.black,
+    shadowOffset: { width: 0, height: 3 },
+    shadowOpacity: 0.2,
+    shadowRadius: 4,
+    elevation: 5,
+  },
+  text: {
+    fontWeight: 'bold',
+    color: theme.colors.primary,
+    fontSize: theme.typography.fontSize.md,
+  }
+});

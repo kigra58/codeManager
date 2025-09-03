@@ -1,4 +1,5 @@
-import { View } from "react-native";
+import { View, StyleSheet } from "react-native";
+import { theme } from "../theme/theme";
 import InputField from "./InputField";
 import { Control, FieldErrors } from "react-hook-form";
 
@@ -11,7 +12,7 @@ interface DocumentUploadProps {
 
 export default function DocumentUpload({ title, field, control, errors }: DocumentUploadProps) {
   return (
-    <View style={{ marginBottom: 20 }}>
+    <View style={styles.container}>
       <InputField
         label={title}
         required
@@ -22,3 +23,9 @@ export default function DocumentUpload({ title, field, control, errors }: Docume
     </View>
   );
 }
+
+const styles = StyleSheet.create({
+  container: {
+    marginBottom: theme.spacing.md,
+  },
+});

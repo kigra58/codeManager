@@ -1,84 +1,86 @@
 import React from 'react';
-import {ScrollView, SafeAreaView, Alert, Text} from 'react-native';
-import TripInfoForm from './TripInfo';
-import DocumentUpload from './DocumentUpload';
-import DriverDetailsForm from './DriverDetailsForm';
-import Declaration from './Declaration';
-import FormActions from './FormAction';
+import { ScrollView, SafeAreaView, View, StyleSheet } from 'react-native';
+import { theme } from '../theme/theme';
 import Timer from './Timer';
-import {useForm} from 'react-hook-form';
-import {zodResolver} from '@hookform/resolvers/zod';
-import {z} from 'zod';
-import {registerTripSchema} from '../schema/registerTripSchema';
-
-type TripFormType = z.infer<typeof registerTripSchema>;
+import { TripFormProvider } from '../contexts/FormContext';
+import { useFormContext } from '../contexts/FormContext';
+import Step1TripInfo from './FormSteps/Step1TripInfo';
+import Step2Documents from './FormSteps/Step2Documents';
+import Step3DriverDetails from './FormSteps/Step3DriverDetails';
+import Step4Declaration from './FormSteps/Step4Declaration';
+import Step5Review from './FormSteps/Step5Review';
+import StepNavigation from './FormSteps/StepNavigation';
 
 export default function TripRegister() {
-  const {
-    control,
-    handleSubmit,
-    reset,
-    formState: {errors},
-  } = useForm<TripFormType>({
-    resolver: zodResolver(registerTripSchema),
-    defaultValues: {
-      vehicleNumber: '',
-      entryDate: '',
-      exitDate: '',
-      rcDoc: '',
-      pucDoc: '',
-      insuranceDoc: '',
-      driverName: '',
-      driverEmail: '',
-      driverPhone: '',
-      declaration: false,
-    },
-  });
-
-  const onSubmit = (data: TripFormType) => {
-    console.log('Form submitted:', data);
-    Alert.alert('Success', 'Trip Registered Successfully!');
-    reset();
-  };
-
-  const onClear = () => {
-    reset();
-  };
-
-  // Pass form props to children: register, setValue, watch, errors
   return (
-    <SafeAreaView style={{flex: 1, padding: 20}}>
+    <TripFormProvider>
+      <TripRegisterContent />
+    </TripFormProvider>
+  );
+}
+
+function TripRegisterContent() {
+  const { currentStep } = useFormContext();
+
+  // Render the current step
+  const renderStep = () => {
+    switch (currentStep) {
+      case 1:
+        return <Step1TripInfo />;
+      case 2:
+        return <Step2Documents />;
+      case 3:
+        return <Step3DriverDetails />;
+      case 4:
+        return <Step4Declaration />;
+      case 5:
+        return <Step5Review />;
+      default:
+        return <Step1TripInfo />;
+    }
+  };
+
+  return (
+    <SafeAreaView style={styles.container}>
       <ScrollView>
         <Timer />
-        <TripInfoForm control={control} errors={errors} />
-        <DocumentUpload
-          title="Registration Certificate (RC)"
-          field="rcDoc"
-          control={control}
-          errors={errors}
-        />
-        <DocumentUpload
-          title="Pollution Under Control (PUC)"
-          field="pucDoc"
-          control={control}
-          errors={errors}
-        />
-        <DocumentUpload
-          title="Insurance Certificate"
-          field="insuranceDoc"
-          control={control}
-          errors={errors}
-        />
-        <DriverDetailsForm control={control} errors={errors} />
-        <Declaration control={control} errors={errors} />
-        <FormActions onClear={onClear} onSubmit={handleSubmit(onSubmit)} />
-        {/* Show top-level errors if needed */}
-        {errors.declaration && (
-          <Text style={{color: 'red', marginTop: 8}}>
-            {errors.declaration.message}
-          </Text>
-        )}
+        <View style={styles.stepIndicator}>
+          {[1, 2, 3, 4, 5].map((step) => (
+            <View
+              key={step}
+              style={[
+                styles.stepDot,
+                currentStep === step ? styles.activeStep : {},
+                currentStep > step ? styles.completedStep : {},
+              ]}
+            />
+          ))}
+        </View>
+        {renderStep()}
+        <StepNavigation />
       </ScrollView>
     </SafeAreaView>
   );
 }
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    padding: theme.spacing.md,
+    backgroundColor: theme.colors.background,
+  },
+  stepIndicator: {
+    flexDirection: 'row',
+    justifyContent: 'center',
+    marginBottom: theme.spacing.md,
+  },
+  stepDot: {
+    ...theme.components.stepIndicator.dot,
+  },
+  activeStep: {
+    ...theme.components.stepIndicator.activeDot,
+  },
+  completedStep: {
+    ...theme.components.stepIndicator.completedDot,
+  },
+});
