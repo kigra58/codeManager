@@ -1,9 +1,10 @@
-import React, { createContext, useContext, useState, ReactNode } from 'react';
+import React, { createContext, useContext, useState, ReactNode, useEffect } from 'react';
 import { useForm, FormProvider as RHFFormProvider } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { registerTripSchema } from '../schema/registerTripSchema';
 import { Alert } from 'react-native';
+import { saveFormData, getFormData, saveCurrentStep, getCurrentStep, clearFormStorage, updateFormData } from '../utils/storageUtils';
 
 type TripFormType = z.infer<typeof registerTripSchema>;
 
@@ -18,6 +19,7 @@ interface FormContextProps {
   resetForm: () => void;
   submitForm: () => void;
   timeLeft: number;
+  isLoading: boolean;
 }
 
 const FormContext = createContext<FormContextProps | undefined>(undefined);
@@ -25,6 +27,7 @@ const FormContext = createContext<FormContextProps | undefined>(undefined);
 export const TripFormProvider = ({ children }: { children: ReactNode }) => {
   const [currentStep, setCurrentStep] = useState(1);
   const [timeLeft, setTimeLeft] = useState(15 * 60); // 15 minutes in seconds
+  const [isLoading, setIsLoading] = useState(true);
   const totalSteps = 5; // Total number of steps in the form
 
   const methods = useForm<TripFormType>({
@@ -43,6 +46,33 @@ export const TripFormProvider = ({ children }: { children: ReactNode }) => {
     },
     mode: 'onChange',
   });
+  
+  // Load saved form data and current step from AsyncStorage on mount
+  useEffect(() => {
+    const loadSavedState = async () => {
+      try {
+        setIsLoading(true);
+        // Get saved form data
+        const savedData = await getFormData();
+        if (savedData) {
+          // Reset form with saved values
+          methods.reset(savedData);
+        }
+        
+        // Get saved step
+        const savedStep = await getCurrentStep();
+        if (savedStep) {
+          setCurrentStep(savedStep);
+        }
+      } catch (error) {
+        console.error('Error loading saved state:', error);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+    
+    loadSavedState();
+  }, []);
 
   // Timer effect
   React.useEffect(() => {
@@ -52,22 +82,36 @@ export const TripFormProvider = ({ children }: { children: ReactNode }) => {
     }, 1000);
     return () => clearInterval(interval);
   }, [timeLeft]);
+  
+  // Save form data whenever it changes
+  useEffect(() => {
+    const subscription = methods.watch((data) => {
+      updateFormData(data as Partial<TripFormType>);
+    });
+    
+    return () => subscription.unsubscribe();
+  }, [methods.watch]);
 
   const nextStep = () => {
     if (currentStep < totalSteps) {
-      setCurrentStep(currentStep + 1);
+      const newStep = currentStep + 1;
+      setCurrentStep(newStep);
+      saveCurrentStep(newStep);
     }
   };
 
   const prevStep = () => {
     if (currentStep > 1) {
-      setCurrentStep(currentStep - 1);
+      const newStep = currentStep - 1;
+      setCurrentStep(newStep);
+      saveCurrentStep(newStep);
     }
   };
 
   const goToStep = (step: number) => {
     if (step >= 1 && step <= totalSteps) {
       setCurrentStep(step);
+      saveCurrentStep(step);
     }
   };
 
@@ -75,11 +119,14 @@ export const TripFormProvider = ({ children }: { children: ReactNode }) => {
     methods.reset();
     setCurrentStep(1);
     setTimeLeft(15 * 60); // Reset timer to 15 minutes
+    clearFormStorage(); // Clear stored form data
   };
 
   const submitForm = () => {
     methods.handleSubmit((data) => {
       console.log('Form submitted:', data);
+      // Clear form data from storage after successful submission
+      clearFormStorage();
       Alert.alert('Success', 'Trip Registered Successfully!');
       resetForm();
     })();
@@ -98,6 +145,7 @@ export const TripFormProvider = ({ children }: { children: ReactNode }) => {
         resetForm,
         submitForm,
         timeLeft,
+        isLoading,
       }}>
       <RHFFormProvider {...methods}>{children}</RHFFormProvider>
     </FormContext.Provider>

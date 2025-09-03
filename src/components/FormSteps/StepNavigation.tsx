@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, Button, StyleSheet, TouchableOpacity, Text } from 'react-native';
+import { View, StyleSheet, TouchableOpacity, Text, ActivityIndicator } from 'react-native';
 import { theme } from '../../theme/theme';
 import { useFormContext } from '../../contexts/FormContext';
 import { useFormContext as useRHFContext } from 'react-hook-form';
@@ -9,7 +9,7 @@ interface StepNavigationProps {
 }
 
 export default function StepNavigation({ onSubmit }: StepNavigationProps) {
-  const { currentStep, nextStep, prevStep, isFirstStep, isLastStep, resetForm, submitForm, totalSteps } = useFormContext();
+  const { currentStep, nextStep, prevStep, isFirstStep, isLastStep, resetForm, submitForm, totalSteps, isLoading } = useFormContext();
   const { trigger } = useRHFContext();
 
   const handleNext = async () => {
@@ -55,14 +55,24 @@ export default function StepNavigation({ onSubmit }: StepNavigationProps) {
     resetForm();
   };
 
+  if (isLoading) {
+    return (
+      <View style={styles.loadingContainer}>
+        <ActivityIndicator size="large" color={theme.colors.primary} />
+        <Text style={styles.loadingText}>Loading saved form data...</Text>
+      </View>
+    );
+  }
+
   return (
     <View style={styles.container}>
       {currentStep > 0 && (
         <TouchableOpacity
-          style={[styles.button, styles.previousButton]}
+          style={[styles.button, styles.previousButton, isFirstStep && styles.disabledButton]}
           onPress={handlePrevious}
+          disabled={isFirstStep}
         >
-          <Text style={styles.buttonText}>Previous</Text>
+          <Text style={[styles.buttonText, isFirstStep && styles.disabledButtonText]}>Previous</Text>
         </TouchableOpacity>
       )}
       {currentStep < totalSteps - 1 && (
@@ -98,6 +108,17 @@ const styles = StyleSheet.create({
     marginVertical: theme.spacing.md,
     paddingHorizontal: theme.spacing.sm,
   },
+  loadingContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    padding: theme.spacing.lg,
+  },
+  loadingText: {
+    marginTop: theme.spacing.md,
+    fontSize: theme.typography.fontSize.md,
+    color: theme.colors.text,
+  },
   button: {
     paddingVertical: theme.spacing.sm,
     paddingHorizontal: theme.spacing.md,
@@ -128,5 +149,11 @@ const styles = StyleSheet.create({
   },
   submitButton: {
     backgroundColor: theme.colors.success,
+  },
+  disabledButton: {
+    opacity: 0.5,
+  },
+  disabledButtonText: {
+    color: theme.colors.gray,
   },
 });

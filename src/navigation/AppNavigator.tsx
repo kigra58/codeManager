@@ -1,15 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
-
-import DashboardScreen from '../screens/DashboardScreen';
 import SplashScreen from '../screens/Splash/Splash';
-import { useAuth } from '../contexts/AuthContext';
-import LoginScreen from '../screens/Auth/LoginScreen';
-import SignupScreen from '../screens/Auth/SignupScreen';
-
 import { RootStackParamList } from '../utils/interfaces';
-import { ROUTES } from '../routes/routes';
 import TripRegister from '../components/TripRegister';
 
 
@@ -17,7 +10,6 @@ import TripRegister from '../components/TripRegister';
 const Stack = createNativeStackNavigator<RootStackParamList>();
 
 const AppNavigator:React.FC = () => {
-  const { user } = useAuth();
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {

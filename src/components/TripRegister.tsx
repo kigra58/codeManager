@@ -1,21 +1,12 @@
 import React from 'react';
-import { ScrollView, SafeAreaView, View, StyleSheet } from 'react-native';
+import { ScrollView, SafeAreaView, View, StyleSheet, Text } from 'react-native';
 import { theme } from '../theme/theme';
 import Timer from './Timer';
-import { TripFormProvider } from '../contexts/FormContext';
 import { useFormContext } from '../contexts/FormContext';
 import StepNavigation from './FormSteps/StepNavigation';
 import { FORM_STEPS } from '../utils/constant';
 
 export default function TripRegister() {
-  return (
-    <TripFormProvider>
-      <TripRegisterContent />
-    </TripFormProvider>
-  );
-}
-
-function TripRegisterContent() {
   const { currentStep } = useFormContext();
 
   // Render the current step
@@ -66,5 +57,18 @@ const styles = StyleSheet.create({
   },
   completedStep: {
     ...theme.components.stepIndicator.completedDot,
+  },
+  testContainer: {
+    marginTop: theme.spacing.lg,
+    padding: theme.spacing.md,
+    borderTopWidth: 1,
+    borderTopColor: theme.colors.border,
+  },
+  testTitle: {
+    fontSize: theme.typography.fontSize.lg,
+    fontWeight: 'bold',
+    textAlign: 'center',
+    marginBottom: theme.spacing.md,
+    color: theme.colors.primary,
   },
 });
