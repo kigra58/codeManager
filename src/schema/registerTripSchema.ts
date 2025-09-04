@@ -18,7 +18,11 @@ export const registerTripSchema = z.object({
   insuranceDoc: z.string().min(1, "Insurance document is required"),
   driverName: z.string().min(1, "Driver name is required")
    .min(3, "Driver name is too short")
-   .max(50, "Driver name is too long"),
+   .max(50, "Driver name is too long")
+   .refine(
+     (value) => /^[a-zA-Z\s]+$/.test(value),
+     { message: "Driver name can only contain letters and spaces" }
+   ),
   driverEmail: z.string().email("Invalid email"),
   driverPhone: z.string()
     .min(1, "Phone number is required")
@@ -27,6 +31,17 @@ export const registerTripSchema = z.object({
     .refine(
       (value) => /^[0-9+]+$/.test(value),
       { message: "Phone number can only contain numbers and '+' symbol" }
+    ),
+  driverLicenseNumber: z.string()
+    .min(1, "Driver's license number is required")
+    .length(14, "Driver's license number must be exactly 14 characters")
+    .refine(
+      (value) => /^DL-\d{11}$/.test(value),
+      { message: "Driver's license number must be in format DL-00000000000" }
+    )
+    .refine(
+      (value) => /^[A-Z0-9-]+$/.test(value),
+      { message: "Driver's license number can only contain letters, numbers, and hyphen" }
     ),
   declaration: z.boolean().refine(val => val === true, {
     message: "You must agree to the declaration"

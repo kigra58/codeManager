@@ -1,12 +1,32 @@
-import React from 'react';
+import React, { useMemo, useEffect } from 'react';
 import { View, Text, StyleSheet } from 'react-native';
 import { theme } from '../../theme/theme';
 import { useFormContext as useRHFContext } from 'react-hook-form';
-import InputField from '../InputField';
 import { FORM_STEPS } from '../../utils/constant';
+import DocumentUpload from '../DocumentUpload';
+import InputField from '../InputField';
+import DateTimePickerField from '../DateTimePickerField';
 
 export default function Step3DriverDetails() {
-  const { control, formState: { errors } } = useRHFContext();
+  const { control, formState: { errors }, setValue } = useRHFContext();
+  
+  // Ensure date fields are empty on component mount
+  useEffect(() => {
+    // Clear date fields if they have default values
+    setValue('driverDob', '');
+    setValue('dlIssueDate', '');
+    setValue('dlExpiryDate', '');
+  }, [setValue]);
+
+  // Calculate date 18 years ago for DOB max date
+  const maxDobDate = useMemo(() => {
+    const date = new Date();
+    date.setFullYear(date.getFullYear() - 18);
+    return date;
+  }, []);
+
+  // Current date for DL Issue Date max and DL Expiry Date min
+  const currentDate = useMemo(() => new Date(), []);
 
   return (
     <View style={styles.container}>
@@ -15,25 +35,77 @@ export default function Step3DriverDetails() {
         label="Driver Name"
         required
         name="driverName"
+        placeholder='Enter driver name'
         control={control}
         error={typeof errors.driverName?.message === 'string' ? errors.driverName.message : undefined}
       />
+      <DateTimePickerField
+        label="Date of Birth"
+        required
+        name="driverDob"
+        control={control}
+        error={typeof errors.driverDob?.message === 'string' ? errors.driverDob.message : undefined}
+        placeholder="mm/dd/yyyy"
+        dateOnly={true}
+        maxDate={maxDobDate}
+      />
       <InputField
-        label="Email"
+        label="Email Address"
         required
         name="driverEmail"
+        placeholder='Enter email address'
         control={control}
         keyboardType="email-address"
         error={typeof errors.driverEmail?.message === 'string' ? errors.driverEmail.message : undefined}
       />
       <InputField
-        label="Phone"
+        label="Phone Number"
         required
         name="driverPhone"
+        placeholder='Enter phone number'
         control={control}
         keyboardType="phone-pad"
         error={typeof errors.driverPhone?.message === 'string' ? errors.driverPhone.message : undefined}
       />
+      <InputField
+        label="Driver's License Number"
+        required
+        name="driverLicenseNumber"
+        control={control}
+        placeholder="Format: DL-00000000000"
+        maxLength={14} // DL- + 11 digits
+        forceUppercase={true}
+        error={typeof errors.driverLicenseNumber?.message === 'string' ? errors.driverLicenseNumber.message : undefined}
+      />
+      <DateTimePickerField
+        label="DL Issue Date"
+        required
+        name="dlIssueDate"
+        control={control}
+        error={typeof errors.dlIssueDate?.message === 'string' ? errors.dlIssueDate.message : undefined}
+        placeholder="mm/dd/yyyy"
+        dateOnly={true}
+        maxDate={currentDate} // Only allow past dates (up to current date)
+      />
+      <DateTimePickerField
+        label="DL Expiry Date"
+        required
+        name="dlExpiryDate"
+        control={control}
+        error={typeof errors.dlExpiryDate?.message === 'string' ? errors.dlExpiryDate.message : undefined}
+        placeholder="mm/dd/yyyy"
+        dateOnly={true}
+        minDate={currentDate} // Only allow future dates (from current date)
+      />
+      <View style={styles.imageUploadContainer}>
+        <DocumentUpload
+          title="DL Image (Optional - JPG or PNG, max 5MB)"
+          field="dlImage"
+          control={control}
+          errors={errors}
+          required={false}
+        />
+      </View>
     </View>
   );
 }
@@ -55,5 +127,19 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     marginBottom: theme.spacing.md,
     color: theme.colors.text,
+  },
+  label: {
+    fontWeight: '600',
+    fontSize: theme.typography.fontSize.md,
+    marginBottom: theme.spacing.sm,
+    color: theme.colors.dark,
+  },
+  infoText: {
+    fontWeight: 'normal',
+    fontSize: theme.typography.fontSize.sm,
+    color: theme.colors.gray,
+  },
+  imageUploadContainer: {
+    marginTop: theme.spacing.sm,
   },
 });

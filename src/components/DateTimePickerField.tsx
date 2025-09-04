@@ -1,10 +1,10 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, Platform, Modal } from 'react-native';
 import { theme } from '../theme/theme';
 import { Controller } from 'react-hook-form';
 import type { Control } from 'react-hook-form';
 import DateTimePicker from '@react-native-community/datetimepicker';
-import { formatDateTime } from '../utils/dateUtils';
+import { formatDateTime, formatDate } from '../utils/dateUtils';
 
 interface DateTimePickerFieldProps {
   label: string;
@@ -14,6 +14,8 @@ interface DateTimePickerFieldProps {
   required?: boolean;
   placeholder?: string;
   minDate?: Date;
+  maxDate?: Date;
+  dateOnly?: boolean;
 }
 
 const DateTimePickerField: React.FC<DateTimePickerFieldProps> = ({
@@ -24,40 +26,74 @@ const DateTimePickerField: React.FC<DateTimePickerFieldProps> = ({
   required,
   placeholder,
   minDate,
+  maxDate,
+  dateOnly = false,
 }) => {
   const [show, setShow] = useState(false);
   const [mode, setMode] = useState<'date' | 'time'>('date');
   const [tempDate, setTempDate] = useState<Date | null>(null);
+  const [isNewSelection, setIsNewSelection] = useState(false);
 
   return (
     <Controller
       control={control}
       name={name}
       render={({ field: { onChange, value } }) => {
-        const currentValue = value ? new Date(value) : new Date();
-        const displayValue = value ? formatDateTime(new Date(value)) : '';
+        // Only use a date object when a value exists
+        const currentValue = value ? new Date(value) : null;
+        // Only display a value if one exists in the form
+        const displayValue = value && value !== '' ? 
+          (dateOnly ? formatDate(new Date(value)) : formatDateTime(new Date(value))) 
+          : '';
 
         const openPicker = () => {
-          // Use current date as default if no value is set
+          // Use current date as initial date when opening the picker
           const now = new Date();
-          const initialDate = value ? new Date(value) : now;
+          let initialDate = now;
           
-          // If minDate is provided and initialDate is before minDate, use minDate
-          if (minDate && initialDate < minDate) {
-            setTempDate(new Date(minDate));
-          } else {
-            setTempDate(initialDate);
+          // Track if this is a new selection (no existing value)
+          setIsNewSelection(!value || value === '');
+          
+          // If value exists, use that as the initial date
+          if (value && value !== '') {
+            initialDate = new Date(value);
+          } 
+          // If no value, use current date or minDate (whichever is later) for future dates
+          // or current date or maxDate (whichever is earlier) for past dates
+          else {
+            if (minDate && maxDate) {
+              // If both min and max are provided, use appropriate one
+              if (now < minDate) {
+                initialDate = new Date(minDate);
+              } else if (now > maxDate) {
+                initialDate = new Date(maxDate);
+              } else {
+                initialDate = now;
+              }
+            } else if (minDate) {
+              // For future dates (like expiry date)
+              initialDate = now < minDate ? new Date(minDate) : now;
+            } else if (maxDate) {
+              // For past dates (like issue date)
+              initialDate = now > maxDate ? new Date(maxDate) : now;
+            } else {
+              initialDate = now;
+            }
           }
+          
+          setTempDate(initialDate);
           
           setMode('date');
           setShow(true);
         };
 
         const handleChange = (event: any, selectedDate?: Date) => {
-          // If user canceled or no date selected
-          if (!selectedDate) {
-            if (Platform.OS === 'android') {
-              setShow(false);
+          // Handle cancel action (Android)
+          if (event.type === 'dismissed' || !selectedDate) {
+            setShow(false);
+            // If this was a new selection (no previous value), ensure the field remains empty
+            if (isNewSelection) {
+              onChange('');
             }
             return;
           }
@@ -90,6 +126,20 @@ const DateTimePickerField: React.FC<DateTimePickerFieldProps> = ({
             }
             
             setTempDate(updatedDate);
+            
+            // For dateOnly mode, we don't need to show time picker
+            if (dateOnly) {
+              // Set time to 00:00 for date only fields
+              updatedDate.setHours(0);
+              updatedDate.setMinutes(0);
+              updatedDate.setSeconds(0);
+              updatedDate.setMilliseconds(0);
+              
+              // Update the form value with the date only
+              onChange(updatedDate.toISOString());
+              setShow(false);
+              return;
+            }
             
             // For Android, show time picker after date is selected
             if (Platform.OS === 'android') {
@@ -158,12 +208,13 @@ const DateTimePickerField: React.FC<DateTimePickerFieldProps> = ({
             {show && Platform.OS === 'android' && (
               <DateTimePicker
                 testID="dateTimePicker"
-                value={tempDate || currentValue}
+                value={tempDate || (currentValue || new Date())}
                 mode={mode}
                 is24Hour={true}
                 display="default"
                 onChange={handleChange}
-                minimumDate={minDate || new Date()}
+                minimumDate={minDate}
+                maximumDate={maxDate}
               />
             )}
             
@@ -177,7 +228,13 @@ const DateTimePickerField: React.FC<DateTimePickerFieldProps> = ({
                   <View style={styles.modalContent}>
                     <View style={styles.modalHeader}>
                       <TouchableOpacity 
-                        onPress={() => setShow(false)}
+                        onPress={() => {
+                          setShow(false);
+                          // If this was a new selection (no previous value), ensure the field remains empty
+                          if (isNewSelection) {
+                            onChange('');
+                          }
+                        }}
                         style={styles.modalButton}
                       >
                         <Text style={styles.modalButtonText}>Cancel</Text>
@@ -190,7 +247,22 @@ const DateTimePickerField: React.FC<DateTimePickerFieldProps> = ({
                       <TouchableOpacity 
                         onPress={() => {
                           if (mode === 'date') {
-                            setMode('time');
+                            if (dateOnly) {
+                              // For date only fields, we're done after selecting the date
+                              if (tempDate) {
+                                // Set time to 00:00 for date only fields
+                                const finalDate = new Date(tempDate);
+                                finalDate.setHours(0);
+                                finalDate.setMinutes(0);
+                                finalDate.setSeconds(0);
+                                finalDate.setMilliseconds(0);
+                                
+                                onChange(finalDate.toISOString());
+                              }
+                              setShow(false);
+                            } else {
+                              setMode('time');
+                            }
                           } else {
                             if (tempDate) {
                               // Check against minimum date constraints
@@ -222,20 +294,21 @@ const DateTimePickerField: React.FC<DateTimePickerFieldProps> = ({
                         style={styles.modalButton}
                       >
                         <Text style={styles.modalButtonText}>
-                          {mode === 'date' ? 'Next' : 'Done'}
+                          {mode === 'date' ? (dateOnly ? 'Done' : 'Next') : 'Done'}
                         </Text>
                       </TouchableOpacity>
                     </View>
                     
                     <DateTimePicker
                       testID="dateTimePicker"
-                      value={tempDate || currentValue}
+                      value={tempDate || (currentValue || new Date())}
                       mode={mode}
                       is24Hour={true}
                       display="spinner"
                       onChange={handleChange}
+                      minimumDate={minDate}
+                      maximumDate={maxDate}
                       style={styles.iOSPicker}
-                      minimumDate={minDate || new Date()}
                       themeVariant="light"
                       textColor="#000000"
                     />
