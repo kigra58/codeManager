@@ -1,6 +1,6 @@
 import React, { useMemo } from 'react';
 import { Text, View, StyleSheet } from 'react-native';
-import { useFormContext } from 'react-hook-form';
+import { useFormContext, useWatch } from 'react-hook-form';
 import InputField from './InputField';
 import DateTimePickerField from './DateTimePickerField';
 import DocumentUpload from './DocumentUpload';
@@ -15,6 +15,13 @@ interface CertificateProps {
 const Certificate = ({ imageFieldTitle, isRC, fieldPrefix = '' }: CertificateProps) => {
   const { control, formState: { errors } } = useFormContext();
   const currentDate = useMemo(() => new Date(), []);
+  
+  // Watch the issue date to set the minimum date for expiry date
+  const issueDate = useWatch({
+    control,
+    name: `${fieldPrefix}issueDate`,
+    defaultValue: ''
+  });
 
   return (
     <View>
@@ -49,7 +56,7 @@ const Certificate = ({ imageFieldTitle, isRC, fieldPrefix = '' }: CertificatePro
           String(errors[`${fieldPrefix}expiryDate`]?.message || '') : undefined}
         placeholder="mm/dd/yyyy"
         dateOnly={true}
-        minDate={currentDate} // Only allow future dates (from current date)
+        minDate={issueDate ? new Date(new Date(issueDate).getTime() + 86400000) : currentDate} // Set minimum to day after issue date or current date
       />
 
       <DocumentUpload

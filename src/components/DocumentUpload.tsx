@@ -15,6 +15,7 @@ interface DocumentUploadProps {
 
 export default function DocumentUpload({ title, field, control, errors, required = true }: DocumentUploadProps) {
   const [imagePreview, setImagePreview] = useState<string | null>(null);
+  const [fileName, setFileName] = useState<string | null>(null);
 
   // Request camera permission for Android
   const requestCameraPermission = async () => {
@@ -117,6 +118,9 @@ export default function DocumentUpload({ title, field, control, errors, required
         } else if (response.assets && response.assets[0]) {
           const selectedImage = response.assets[0];
           setImagePreview(selectedImage.uri || null);
+          // Extract file name from path or use a default name
+          const name = selectedImage.fileName || 'camera_photo.jpg';
+          setFileName(name);
         }
       },
     );
@@ -160,6 +164,9 @@ export default function DocumentUpload({ title, field, control, errors, required
         } else if (response.assets && response.assets[0]) {
           const selectedImage = response.assets[0];
           setImagePreview(selectedImage.uri || null);
+          // Extract file name from path or use a default name
+          const name = selectedImage.fileName || 'camera_photo.jpg';
+          setFileName(name);
         }
       },
     );
@@ -186,16 +193,28 @@ export default function DocumentUpload({ title, field, control, errors, required
         // Set preview if value exists
         React.useEffect(() => {
           if (value && !imagePreview) {
-            setImagePreview(value);
+            if (typeof value === 'object' && value.uri) {
+              setImagePreview(value.uri);
+              setFileName(value.fileName || 'Selected Image');
+            } else if (typeof value === 'string') {
+              setImagePreview(value);
+              // Extract filename from path if possible
+              const pathParts = value.split('/');
+              setFileName(pathParts[pathParts.length - 1] || 'Selected Image');
+            }
           }
         }, [value]);
         
         // Update form value when imagePreview changes
         React.useEffect(() => {
           if (imagePreview) {
-            onChange(imagePreview);
+            // Save both URI and filename to form value
+            onChange({
+              uri: imagePreview,
+              fileName: fileName || 'Selected Image'
+            });
           }
-        }, [imagePreview, onChange]);
+        }, [imagePreview, fileName, onChange]);
 
         return (
           <View style={styles.container}>
@@ -209,7 +228,25 @@ export default function DocumentUpload({ title, field, control, errors, required
             >
               <Text style={styles.uploadButtonText}>Select Image</Text>
             </TouchableOpacity>
-
+            
+            {/* Display selected file name */}
+            {fileName && (
+              <View style={styles.fileInfoContainer}>
+                <Text style={styles.fileNameText} numberOfLines={1} ellipsizeMode="middle">
+                  {fileName}
+                </Text>
+                <TouchableOpacity 
+                  style={styles.removeButton}
+                  onPress={() => {
+                    setImagePreview(null);
+                    setFileName(null);
+                    onChange(null);
+                  }}
+                >
+                  <Text style={styles.removeButtonText}>Remove</Text>
+                </TouchableOpacity>
+              </View>
+            )}
 
             {errors[field] && (
               <Text style={styles.errorText}>
@@ -244,7 +281,7 @@ const styles = StyleSheet.create({
     padding: theme.spacing.md,
     borderRadius: theme.borderRadius.md,
     alignItems: 'center',
-    marginBottom: theme.spacing.md,
+    marginBottom: theme.spacing.sm,
   },
   uploadButtonText: {
     color: theme.colors.white,
@@ -260,12 +297,29 @@ const styles = StyleSheet.create({
     borderRadius: theme.borderRadius.md,
     marginBottom: theme.spacing.sm,
   },
+  fileInfoContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    backgroundColor: theme.colors.light,
+    borderRadius: theme.borderRadius.md,
+    padding: theme.spacing.sm,
+    marginBottom: theme.spacing.md,
+    borderWidth: 1,
+    borderColor: theme.colors.border,
+  },
+  fileNameText: {
+    flex: 1,
+    fontSize: theme.typography.fontSize.sm,
+    color: theme.colors.dark,
+    marginRight: theme.spacing.sm,
+  },
   removeButton: {
     backgroundColor: theme.colors.danger,
-    padding: theme.spacing.sm,
+    padding: theme.spacing.xs,
+    paddingHorizontal: theme.spacing.sm,
     borderRadius: theme.borderRadius.md,
     alignItems: 'center',
-    alignSelf: 'flex-start',
   },
   removeButtonText: {
     color: theme.colors.white,
