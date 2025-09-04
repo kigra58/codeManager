@@ -1,11 +1,29 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 import { View, Text, StyleSheet } from 'react-native';
 import { theme } from '../../theme/theme';
 import { useFormContext as useRHFContext } from 'react-hook-form';
 import InputField from '../InputField';
+import DateTimePickerField from '../DateTimePickerField';
 
 export default function Step1TripInfo() {
-  const { control, formState: { errors } } = useRHFContext();
+  const { control, formState: { errors }, watch } = useRHFContext();
+  
+  // Get the current date to use as minimum date
+  const currentDate = useMemo(() => new Date(), []);
+  
+  // Get the entry date to use as minimum date for exit date
+  const entryDateValue = watch('entryDate');
+  const entryDate = useMemo(() => {
+    // If entry date is selected, use it as minimum for exit date
+    // Otherwise use current date as minimum
+    if (entryDateValue) {
+      const date = new Date(entryDateValue);
+      // Add 1 minute to ensure exit date is always greater than entry date
+      date.setMinutes(date.getMinutes() + 1);
+      return date;
+    }
+    return currentDate;
+  }, [entryDateValue, currentDate]);
 
   return (
     <View style={styles.container}>
@@ -15,23 +33,26 @@ export default function Step1TripInfo() {
         required
         name="vehicleNumber"
         control={control}
-        placeholder="Enter vehicle number"
+        placeholder="Format: XX00XX0000"
+        forceUppercase={true}
         error={typeof errors.vehicleNumber?.message === 'string' ? errors.vehicleNumber.message : undefined}
       />
-      <InputField
+      <DateTimePickerField
         label="Entry Date & Time"
         required
         name="entryDate"
         control={control}
         placeholder="YYYY-MM-DD HH:mm"
         error={typeof errors.entryDate?.message === 'string' ? errors.entryDate.message : undefined}
+        minDate={currentDate}
       />
-      <InputField
+      <DateTimePickerField
         label="Exit Date & Time"
         name="exitDate"
         control={control}
         placeholder="YYYY-MM-DD HH:mm"
         error={typeof errors.exitDate?.message === 'string' ? errors.exitDate.message : undefined}
+        minDate={entryDate}
       />
     </View>
   );

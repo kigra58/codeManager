@@ -10,9 +10,10 @@ interface InputFieldProps extends Omit<TextInputProps, "value" | "onChangeText">
   control: Control<any>;
   error?: string;
   required?: boolean;
+  forceUppercase?: boolean;
 }
 
-const InputField: React.FC<InputFieldProps> = ({ label, name, control, error, required, ...props }) => (
+const InputField: React.FC<InputFieldProps> = ({ label, name, control, error, required, forceUppercase, ...props }) => (
   <Controller
     control={control}
     name={name}
@@ -27,8 +28,15 @@ const InputField: React.FC<InputFieldProps> = ({ label, name, control, error, re
             error ? styles.inputError : null
           ]}
           value={value}
-          onChangeText={onChange}
+          onChangeText={(text) => {
+            if (forceUppercase) {
+              onChange(text.toUpperCase());
+            } else {
+              onChange(text);
+            }
+          }}
           placeholderTextColor="#888"
+          autoCapitalize={forceUppercase ? "characters" : props.autoCapitalize}
           {...props}
         />
         {error && (

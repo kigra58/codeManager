@@ -2,8 +2,15 @@ import { z } from "zod";
 
 export const registerTripSchema = z.object({
   vehicleNumber: z.string().min(1, "Vehicle number is required")
-   .min(5, "Vehicle number is too short")
-   .max(7, "Vehicle number is too long"),
+   .length(10, "Vehicle number must be exactly 10 characters")
+   .refine(
+     (value) => /^[A-Z]{2}\d{2}[A-Z]{2}\d{4}$/.test(value),
+     { message: "Vehicle number must be in format XX00XX0000 (e.g., DL01AB1234)" }
+   )
+   .refine(
+     (value) => /^[A-Z0-9]+$/.test(value),
+     { message: "Vehicle number can only contain uppercase letters and numbers" }
+   ),
   entryDate: z.string().min(1, "Entry date & time is required"),
   exitDate: z.string().optional(),
   rcDoc: z.string().min(1, "RC document is required"),
@@ -24,4 +31,23 @@ export const registerTripSchema = z.object({
   declaration: z.boolean().refine(val => val === true, {
     message: "You must agree to the declaration"
   }),
+}).refine((data) => {
+  // Skip validation if exitDate is not provided
+  if (!data.exitDate) return true;
+  
+  // Compare dates only if both dates are provided
+  if (data.entryDate && data.exitDate) {
+    const entryDate = new Date(data.entryDate);
+    const exitDate = new Date(data.exitDate);
+    
+    // Check if exit date is strictly greater than entry date
+    // This ensures they can't be equal
+    const timeDifference = exitDate.getTime() - entryDate.getTime();
+    return timeDifference > 0;
+  }
+  
+  return true;
+}, {
+  message: "Exit date & time must be after entry date & time",
+  path: ["exitDate"], // This will show the error on the exitDate field
 });
