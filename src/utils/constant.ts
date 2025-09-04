@@ -33,3 +33,15 @@ export const FORM_STEPS = [
         component: Step5Review,
     },
 ];
+
+
+export const certificates = [
+    { title: "Registration Certificate", imageFieldTitle: "RC Image", isRC: true, prefix: 'rc_' },
+    { title: "Pollution Certificate", imageFieldTitle: "PUC Image", isRC: false, prefix: 'puc_' },
+    { title: "Insurance Certificate", imageFieldTitle: "Insurance Image", isRC: false, prefix: 'ins_' },
+];
+
+export const PLATFORMS ={
+    ANDROID: "android",
+    IOS: "ios",
+}

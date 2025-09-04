@@ -1,19 +1,46 @@
-import React from 'react';
-import { View, Text, StyleSheet } from 'react-native';
+import React, { useState } from 'react';
+import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
 import { theme } from '../../theme/theme';
-import { FORM_STEPS } from '../../utils/constant';
+import { certificates, FORM_STEPS } from '../../utils/constant';
 import Certificate from '../Certificate';
 
 export default function Step2Documents() {
+  const [activeAccordion, setActiveAccordion] = useState<number>(0);
+
+  // Certificate data
+  const toggleAccordion = (index: number) => {
+    setActiveAccordion(activeAccordion === index ? -1 : index);
+  };
+
   return (
     <View style={styles.container}>
       <Text style={styles.title}>{FORM_STEPS[1].title}</Text>
 
-      {/* RC SECTION STARTS HERE  */}
-      <Certificate title="Registration Certificate" imageFieldTitle="RC Image" isRC={true} />
-      <Certificate title="Pollution Certificate" imageFieldTitle="PUC Image" isRC={false} />
-      <Certificate title="Insurance Certificate" imageFieldTitle="Insurance Image" isRC={false} />
-
+      {/* Certificate Accordion Sections */}
+      {certificates && certificates.length && certificates.map((cert, index) => (
+        <View key={index} style={styles.accordionContainer}>
+          <TouchableOpacity 
+            style={styles.accordionHeader} 
+            onPress={() => toggleAccordion(index)}
+            activeOpacity={0.7}
+          >
+            <Text style={styles.accordionTitle}>{cert.title}</Text>
+            <Text style={styles.accordionIcon}>
+              {activeAccordion === index ? '▲' : '▼'}
+            </Text>
+          </TouchableOpacity>
+          
+          {activeAccordion === index && (
+            <View style={styles.accordionContent}>
+              <Certificate 
+                imageFieldTitle={cert.imageFieldTitle} 
+                isRC={cert.isRC}
+                fieldPrefix={cert.prefix}
+              />
+            </View>
+          )}
+        </View>
+      ))}
     </View>
   );
 }
@@ -35,5 +62,33 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     marginBottom: theme.spacing.md,
     color: theme.colors.text,
+  },
+  accordionContainer: {
+    marginBottom: theme.spacing.md,
+    borderWidth: 1,
+    borderColor: theme.colors.border,
+    borderRadius: theme.borderRadius.md,
+    overflow: 'hidden',
+  },
+  accordionHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    padding: theme.spacing.md,
+    backgroundColor: theme.colors.light,
+  },
+  accordionTitle: {
+    fontSize: theme.typography.fontSize.md,
+    fontWeight: 'bold',
+    color: theme.colors.text,
+  },
+  accordionIcon: {
+    fontSize: 18,
+    color: theme.colors.primary,
+    fontWeight: 'bold',
+  },
+  accordionContent: {
+    padding: theme.spacing.md,
+    backgroundColor: theme.colors.white,
   },
 });
