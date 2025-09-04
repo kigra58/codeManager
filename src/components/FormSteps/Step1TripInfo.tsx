@@ -44,7 +44,7 @@ export default function Step1TripInfo() {
         required
         name="entryDate"
         control={control}
-        placeholder="YYYY-MM-DD HH:mm"
+        placeholder="mm/dd/yyyy hh:mm"
         error={typeof errors.entryDate?.message === 'string' ? errors.entryDate.message : undefined}
         minDate={currentDate}
       />
@@ -52,7 +52,7 @@ export default function Step1TripInfo() {
         label="Exit Date & Time"
         name="exitDate"
         control={control}
-        placeholder="YYYY-MM-DD HH:mm"
+        placeholder="mm/dd/yyyy hh:mm"
         error={typeof errors.exitDate?.message === 'string' ? errors.exitDate.message : undefined}
         minDate={entryDate}
       />

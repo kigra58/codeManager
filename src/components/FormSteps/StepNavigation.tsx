@@ -154,6 +154,6 @@ const styles = StyleSheet.create({
     opacity: 0.5,
   },
   disabledButtonText: {
-    color: theme.colors.gray,
+    color: theme.colors.white,
   },
 });
