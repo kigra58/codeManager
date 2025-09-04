@@ -1,4 +1,5 @@
 {
   "name": "codeManager",
-  "displayName": "codeManager"
+  "displayName": "codeManager",
+  "icon": "./assets/icon.png"
 }
