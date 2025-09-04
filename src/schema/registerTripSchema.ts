@@ -1,6 +1,16 @@
 import { z } from "zod";
 
 export const registerTripSchema = z.object({
+  documentNumber: z.string().min(1, "Document number is required")
+   .length(10, "Document number must be exactly 10 characters")
+   .refine(
+     (value) => /^[A-Z]{2}\d{2}[A-Z]{2}\d{4}$/.test(value),
+     { message: "Document number must be in format XX00XX0000 (e.g., DL01AB1234)" }
+   )
+   .refine(
+     (value) => /^[A-Z0-9]+$/.test(value),
+     { message: "Document number can only contain uppercase letters and numbers" }
+   ),
   vehicleNumber: z.string().min(1, "Vehicle number is required")
    .length(10, "Vehicle number must be exactly 10 characters")
    .refine(

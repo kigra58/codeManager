@@ -33,6 +33,7 @@ export const TripFormProvider = ({ children }: { children: ReactNode }) => {
   const methods = useForm<TripFormType>({
     resolver: zodResolver(registerTripSchema),
     defaultValues: {
+      documentNumber: '',
       vehicleNumber: '',
       entryDate: '',
       exitDate: '',

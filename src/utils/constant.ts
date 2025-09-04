@@ -14,7 +14,7 @@ export const FORM_STEPS = [
     },
     {
         id: 2,
-        title: "Documents",
+        title: "Vehicle Documents",
         component: Step2Documents,
     },
     {

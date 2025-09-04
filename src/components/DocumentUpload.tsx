@@ -210,24 +210,6 @@ export default function DocumentUpload({ title, field, control, errors, required
               <Text style={styles.uploadButtonText}>Select Image</Text>
             </TouchableOpacity>
 
-            {imagePreview ? (
-              <View style={styles.previewContainer}>
-                <Image 
-                  source={{ uri: imagePreview }} 
-                  style={styles.imagePreview} 
-                  resizeMode="cover"
-                />
-                <TouchableOpacity 
-                  style={styles.removeButton}
-                  onPress={() => {
-                    setImagePreview(null);
-                    onChange('');
-                  }}
-                >
-                  <Text style={styles.removeButtonText}>Remove</Text>
-                </TouchableOpacity>
-              </View>
-            ) : null}
 
             {errors[field] && (
               <Text style={styles.errorText}>

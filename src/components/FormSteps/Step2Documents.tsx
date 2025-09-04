@@ -1,34 +1,19 @@
 import React from 'react';
 import { View, Text, StyleSheet } from 'react-native';
 import { theme } from '../../theme/theme';
-import { useFormContext as useRHFContext } from 'react-hook-form';
-import DocumentUpload from '../DocumentUpload';
 import { FORM_STEPS } from '../../utils/constant';
+import Certificate from '../Certificate';
 
 export default function Step2Documents() {
-  const { control, formState: { errors } } = useRHFContext();
-
   return (
     <View style={styles.container}>
       <Text style={styles.title}>{FORM_STEPS[1].title}</Text>
-      <DocumentUpload
-        title="Registration Certificate (RC)"
-        field="rcDoc"
-        control={control}
-        errors={errors}
-      />
-      <DocumentUpload
-        title="Pollution Under Control (PUC)"
-        field="pucDoc"
-        control={control}
-        errors={errors}
-      />
-      <DocumentUpload
-        title="Insurance Certificate"
-        field="insuranceDoc"
-        control={control}
-        errors={errors}
-      />
+
+      {/* RC SECTION STARTS HERE  */}
+      <Certificate title="Registration Certificate" imageFieldTitle="RC Image" isRC={true} />
+      <Certificate title="Pollution Certificate" imageFieldTitle="PUC Image" isRC={false} />
+      <Certificate title="Insurance Certificate" imageFieldTitle="Insurance Image" isRC={false} />
+
     </View>
   );
 }
