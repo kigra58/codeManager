@@ -4,6 +4,7 @@ import { theme } from '../../theme/theme';
 import { useFormContext as useRHFContext } from 'react-hook-form';
 import InputField from '../InputField';
 import DateTimePickerField from '../DateTimePickerField';
+import { FORM_STEPS } from '../../utils/constant';
 
 export default function Step1TripInfo() {
   const { control, formState: { errors }, watch } = useRHFContext();
@@ -27,7 +28,8 @@ export default function Step1TripInfo() {
 
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>Step 1: Trip Information</Text>
+      <Text style={styles.title}>{FORM_STEPS[0].title}</Text>
+      {/* <Text style={styles.title}>Step 1: Trip Information</Text> */}
       <InputField
         label="Vehicle Number"
         required

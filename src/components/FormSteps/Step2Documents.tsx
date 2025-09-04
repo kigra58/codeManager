@@ -3,13 +3,14 @@ import { View, Text, StyleSheet } from 'react-native';
 import { theme } from '../../theme/theme';
 import { useFormContext as useRHFContext } from 'react-hook-form';
 import DocumentUpload from '../DocumentUpload';
+import { FORM_STEPS } from '../../utils/constant';
 
 export default function Step2Documents() {
   const { control, formState: { errors } } = useRHFContext();
 
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>Step 2: Documents</Text>
+      <Text style={styles.title}>{FORM_STEPS[1].title}</Text>
       <DocumentUpload
         title="Registration Certificate (RC)"
         field="rcDoc"

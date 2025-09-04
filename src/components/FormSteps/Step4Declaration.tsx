@@ -4,13 +4,14 @@ import { theme } from '../../theme/theme';
 import { useFormContext as useRHFContext } from 'react-hook-form';
 import CheckBox from '@react-native-community/checkbox';
 import { Controller } from 'react-hook-form';
+import { FORM_STEPS } from '../../utils/constant';
 
 export default function Step4Declaration() {
   const { control, formState: { errors } } = useRHFContext();
 
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>Step 4: Declaration</Text>
+      <Text style={styles.title}>{FORM_STEPS[3].title}</Text> 
       <Controller
         control={control}
         name="declaration"

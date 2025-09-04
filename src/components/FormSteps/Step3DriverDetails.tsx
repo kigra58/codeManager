@@ -3,13 +3,14 @@ import { View, Text, StyleSheet } from 'react-native';
 import { theme } from '../../theme/theme';
 import { useFormContext as useRHFContext } from 'react-hook-form';
 import InputField from '../InputField';
+import { FORM_STEPS } from '../../utils/constant';
 
 export default function Step3DriverDetails() {
   const { control, formState: { errors } } = useRHFContext();
 
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>Step 3: Driver Details</Text>
+      <Text style={styles.title}>{FORM_STEPS[2].title}</Text> 
       <InputField
         label="Driver Name"
         required
