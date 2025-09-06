@@ -4,6 +4,10 @@
     {
       "path": "assets/icon.png",
       "sha1": "7b24310e3c2bf12a12b823ee5810ce74dcab1d4a"
+    },
+    {
+      "path": "assets/splash.png",
+      "sha1": "760626ed3988926b60eb1c0ee7af5ca7e72ebdc7"
     }
   ]
 }
