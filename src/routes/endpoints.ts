@@ -5,6 +5,7 @@ export const ENDPOINTS = {
       SIGNUP : '/signup'  
     },
     TRIP : {
-      REGISTER : '/register-trip'
+      REGISTER : '/register-trip',
+      DOCUMENT_UPLOAD : '/multimedia/upload'
     }
    }

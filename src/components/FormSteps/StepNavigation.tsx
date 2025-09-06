@@ -94,7 +94,7 @@ export default function StepNavigation({ onSubmit }: StepNavigationProps) {
           style={[styles.button, styles.submitButton]}
           onPress={handleSubmit}
         >
-          <Text style={styles.buttonText}>Submit</Text>
+          <Text style={styles.buttonText}>Register Trip</Text>
         </TouchableOpacity>
       )}
     </View>
