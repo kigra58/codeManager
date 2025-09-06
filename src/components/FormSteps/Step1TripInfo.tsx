@@ -5,6 +5,7 @@ import { useFormContext as useRHFContext } from 'react-hook-form';
 import InputField from '../InputField';
 import DateTimePickerField from '../DateTimePickerField';
 import { FORM_STEPS } from '../../utils/constant';
+import FormDatePicker from '../CustomDatePicker';
 
 export default function Step1TripInfo() {
   const { control, formState: { errors }, watch } = useRHFContext();
@@ -39,7 +40,7 @@ export default function Step1TripInfo() {
         forceUppercase={true}
         error={typeof errors.vehicleNumber?.message === 'string' ? errors.vehicleNumber.message : undefined}
       />
-      <DateTimePickerField
+      {/* <DateTimePickerField
         label="Entry Date & Time"
         required
         name="entryDate"
@@ -55,6 +56,39 @@ export default function Step1TripInfo() {
         placeholder="mm/dd/yyyy hh:mm"
         error={typeof errors.exitDate?.message === 'string' ? errors.exitDate.message : undefined}
         minDate={entryDate}
+      /> */}
+      <FormDatePicker
+         label="Entry Date & Time"
+         required
+         name="entryDate"
+         control={control}
+         placeholder="mm/dd/yyyy hh:mm"
+         mode="date"
+        rules={{
+          validate: (value: Date | null) => {
+            if (value && value < new Date()) {
+              return 'Entry date must be in the future';
+            }
+            return true;
+          }
+        }}
+        minimumDate={new Date()}
+      />
+      <FormDatePicker
+        control={control}
+        name="exitDate"
+        label="Exit Date & Time"
+        placeholder="mm/dd/yyyy hh:mm"
+        mode="date"
+        rules={{
+          validate: (value: Date | null) => {
+            if (value && value < new Date()) {
+              return 'Exit date must be in the future';
+            }
+            return true;
+          }
+        }}
+        minimumDate={entryDate}
       />
     </View>
   );
