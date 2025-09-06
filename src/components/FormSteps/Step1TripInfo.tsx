@@ -40,30 +40,14 @@ export default function Step1TripInfo() {
         forceUppercase={true}
         error={typeof errors.vehicleNumber?.message === 'string' ? errors.vehicleNumber.message : undefined}
       />
-      {/* <DateTimePickerField
-        label="Entry Date & Time"
-        required
-        name="entryDate"
-        control={control}
-        placeholder="mm/dd/yyyy hh:mm"
-        error={typeof errors.entryDate?.message === 'string' ? errors.entryDate.message : undefined}
-        minDate={currentDate}
-      />
-      <DateTimePickerField
-        label="Exit Date & Time"
-        name="exitDate"
-        control={control}
-        placeholder="mm/dd/yyyy hh:mm"
-        error={typeof errors.exitDate?.message === 'string' ? errors.exitDate.message : undefined}
-        minDate={entryDate}
-      /> */}
+
       <FormDatePicker
          label="Entry Date & Time"
          required
          name="entryDate"
          control={control}
          placeholder="mm/dd/yyyy hh:mm"
-         mode="date"
+         mode="datetime"
         rules={{
           validate: (value: Date | null) => {
             if (value && value < new Date()) {
@@ -79,7 +63,7 @@ export default function Step1TripInfo() {
         name="exitDate"
         label="Exit Date & Time"
         placeholder="mm/dd/yyyy hh:mm"
-        mode="date"
+        mode="datetime"
         rules={{
           validate: (value: Date | null) => {
             if (value && value < new Date()) {

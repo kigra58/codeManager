@@ -5,7 +5,7 @@ import { useFormContext as useRHFContext } from 'react-hook-form';
 import { FORM_STEPS } from '../../utils/constant';
 import DocumentUpload from '../DocumentUpload';
 import InputField from '../InputField';
-import DateTimePickerField from '../DateTimePickerField';
+import FormDatePicker from '../CustomDatePicker';
 
 export default function Step3DriverDetails() {
   const { control, formState: { errors }, setValue } = useRHFContext();
@@ -39,15 +39,14 @@ export default function Step3DriverDetails() {
         control={control}
         error={typeof errors.driverName?.message === 'string' ? errors.driverName.message : undefined}
       />
-      <DateTimePickerField
+      <FormDatePicker
         label="Date of Birth"
-        required
+        rules={{ required: 'Date of birth is required' }}
         name="driverDob"
         control={control}
-        error={typeof errors.driverDob?.message === 'string' ? errors.driverDob.message : undefined}
         placeholder="mm/dd/yyyy"
-        dateOnly={true}
-        maxDate={maxDobDate}
+        mode="date"
+        maximumDate={maxDobDate}
       />
       <InputField
         label="Email Address"
@@ -77,25 +76,23 @@ export default function Step3DriverDetails() {
         forceUppercase={true}
         error={typeof errors.driverLicenseNumber?.message === 'string' ? errors.driverLicenseNumber.message : undefined}
       />
-      <DateTimePickerField
+      <FormDatePicker
         label="DL Issue Date"
-        required
+        rules={{ required: 'DL issue date is required' }}
         name="dlIssueDate"
         control={control}
-        error={typeof errors.dlIssueDate?.message === 'string' ? errors.dlIssueDate.message : undefined}
         placeholder="mm/dd/yyyy"
-        dateOnly={true}
-        maxDate={currentDate} // Only allow past dates (up to current date)
+        mode="date"
+        maximumDate={currentDate} // Only allow past dates (up to current date)
       />
-      <DateTimePickerField
+      <FormDatePicker
         label="DL Expiry Date"
-        required
+        rules={{ required: 'DL expiry date is required' }}
         name="dlExpiryDate"
         control={control}
-        error={typeof errors.dlExpiryDate?.message === 'string' ? errors.dlExpiryDate.message : undefined}
         placeholder="mm/dd/yyyy"
-        dateOnly={true}
-        minDate={currentDate} // Only allow future dates (from current date)
+        mode="date"
+        minimumDate={currentDate} // Only allow future dates (from current date)
       />
       <View style={styles.imageUploadContainer}>
         <DocumentUpload

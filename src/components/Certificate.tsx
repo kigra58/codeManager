@@ -2,7 +2,7 @@ import React, { useMemo } from 'react';
 import { Text, View, StyleSheet } from 'react-native';
 import { useFormContext, useWatch } from 'react-hook-form';
 import InputField from './InputField';
-import DateTimePickerField from './DateTimePickerField';
+import FormDatePicker from './CustomDatePicker';
 import DocumentUpload from './DocumentUpload';
 import { theme } from '../theme/theme';
 
@@ -36,27 +36,23 @@ const Certificate = ({ imageFieldTitle, isRC, fieldPrefix = '' }: CertificatePro
         error={errors[`${fieldPrefix}documentNumber`] ? 
           String(errors[`${fieldPrefix}documentNumber`]?.message || '') : undefined}
       />
-      <DateTimePickerField
+      <FormDatePicker
         label="Issue Date"
-        required
+        rules={{ required: 'Issue date is required' }}
         name={`${fieldPrefix}issueDate`}
         control={control}
-        error={errors[`${fieldPrefix}issueDate`] ? 
-          String(errors[`${fieldPrefix}issueDate`]?.message || '') : undefined}
         placeholder="mm/dd/yyyy"
-        dateOnly={true}
-        maxDate={currentDate}
+        mode="date"
+        maximumDate={currentDate}
       />
-      <DateTimePickerField
+      <FormDatePicker
         label="Expiry Date"
-        required
+        rules={{ required: 'Expiry date is required' }}
         name={`${fieldPrefix}expiryDate`}
         control={control}
-        error={errors[`${fieldPrefix}expiryDate`] ? 
-          String(errors[`${fieldPrefix}expiryDate`]?.message || '') : undefined}
         placeholder="mm/dd/yyyy"
-        dateOnly={true}
-        minDate={issueDate ? new Date(new Date(issueDate).getTime() + 86400000) : currentDate} // Set minimum to day after issue date or current date
+        mode="date"
+        minimumDate={issueDate ? new Date(new Date(issueDate).getTime() + 86400000) : currentDate} // Set minimum to day after issue date or current date
       />
 
       <DocumentUpload

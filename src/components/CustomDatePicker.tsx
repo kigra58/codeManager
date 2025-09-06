@@ -122,7 +122,8 @@ const FormDatePicker = forwardRef(<
             date={dateValue instanceof Date ? dateValue : new Date()}
             onConfirm={(selectedDate: Date) => {
               setOpen(false);
-              onChange(selectedDate);
+              // Convert Date object to ISO string to avoid "Expecting string received date" error
+              onChange(selectedDate.toISOString());
             }}
             onCancel={() => setOpen(false)}
             mode={mode}
