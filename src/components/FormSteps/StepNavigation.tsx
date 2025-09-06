@@ -1,8 +1,10 @@
-import React from 'react';
-import { View, StyleSheet, TouchableOpacity, Text, ActivityIndicator } from 'react-native';
+import React, { useState } from 'react';
+import { View, StyleSheet, TouchableOpacity, Text, ActivityIndicator, Alert } from 'react-native';
 import { theme } from '../../theme/theme';
 import { useFormContext } from '../../contexts/FormContext';
 import { useFormContext as useRHFContext } from 'react-hook-form';
+import { registerTripService, documentUploadService } from '../../services/tripServices';
+import { IPayload, IDocumentUpload } from '../../utils/interfaces';
 
 interface StepNavigationProps {
   onSubmit?: () => void;
@@ -10,7 +12,32 @@ interface StepNavigationProps {
 
 export default function StepNavigation({ onSubmit }: StepNavigationProps) {
   const { currentStep, nextStep, prevStep, isFirstStep, isLastStep, resetForm, submitForm, totalSteps, isLoading } = useFormContext();
-  const { trigger } = useRHFContext();
+  const { trigger, getValues } = useRHFContext();
+  const [submitting, setSubmitting] = useState(false);
+  
+  /**
+   * Handles document upload for a specific document type
+   * @param docValue The document value from form data
+   * @param docType The type of document (RC, PUCC, INSURANCE)
+   * @param docNumber Optional document number
+   * @returns Object containing mediaId and documentType if successful, null otherwise
+   */
+  const handleDocumentUpload = async (
+    file: File, 
+    docType: "RC" | "PUCC" | "INSURANCE" | "DL", 
+  ) => {
+    if (!file) return null;
+    try {
+      const response = await documentUploadService({document_type: docType, file});
+      console.log(`${docType} document upload response:`, response);
+      if(response?.MediaID){
+        return response?.MediaID
+      }
+    } catch (error) {
+      console.error(`Error uploading ${docType} document:`, error);
+    }
+    return null;
+  };
 
   const handleNext = async () => {
     // Validate the current step fields before proceeding
@@ -39,11 +66,84 @@ export default function StepNavigation({ onSubmit }: StepNavigationProps) {
     }
   };
 
-  const handleSubmit = () => {
+  const handleSubmit = async () => {
     if (onSubmit) {
       onSubmit();
-    } else {
-      submitForm();
+      return;
+    }
+    
+    try {
+      setSubmitting(true);
+      const formData = getValues();
+      console.log('Form data to be submitted:', formData);
+      
+      // Array to store document information including MediaIDs
+      const documentMediaIds: { documentType: "RC" | "PUCC" | "INSURANCE" | "DL"; mediaId: string; number: string }[] = [];
+      
+      // Upload documents in parallel using Promise.all
+      const uploadPromises = [
+        formData.rcDoc ? handleDocumentUpload(formData.rcDoc, "RC") : null,
+        formData.pucDoc ? handleDocumentUpload(formData.pucDoc, "PUCC") : null,
+        formData.insuranceDoc ? handleDocumentUpload(formData.insuranceDoc, "INSURANCE") : null
+      ];
+      
+      const uploadResults = await Promise.all(uploadPromises);
+      
+      // Collect valid MediaIDs
+      const mediaIds = uploadResults.filter(result => result !== null);
+      console.log('Uploaded document MediaIDs:', mediaIds);
+      
+      // Prepare documents array for trip registration using the MediaIDs
+      const documentTypes = ["RC", "PUCC", "INSURANCE"];
+      const documents = [];
+      
+      // Match MediaIDs with document types
+      for (let i = 0; i < uploadResults.length; i++) {
+        const mediaId = uploadResults[i];
+        if (mediaId) {
+          documents.push({
+            documentType: documentTypes[i] as "RC" | "PUCC" | "INSURANCE",
+            number: i === 0 ? formData.documentNumber || '' : '',
+            mediaId: mediaId,
+            issueDate: '',
+            expiryDate: ''
+          });
+        }
+      }
+      
+
+      
+      console.log('Documents for trip registration:', documents);
+      
+      // Prepare payload for trip registration with document MediaIDs
+      const tripPayload: IPayload = {
+        vehicle: {
+          number: formData.vehicleNumber
+        },
+        trip: {
+          EntryDateTime: formData.entryDate,
+          ExitDateTime: formData.exitDate || undefined
+        },
+        documents: documents,
+        driver: {
+          name: formData.driverName,
+          birthDate: '',
+          email: formData.driverEmail,
+          phoneNumber: formData.driverPhone
+        }
+      };
+      
+      // Register trip with document MediaIDs
+      const tripResponse = await registerTripService(tripPayload);
+      console.log('Trip registration response:', tripResponse);
+      
+      Alert.alert('Success', 'Trip registered and documents uploaded successfully!');
+      resetForm();
+    } catch (error) {
+      console.error('Error submitting form:', error);
+      Alert.alert('Error', 'Failed to register trip. Please try again.');
+    } finally {
+      setSubmitting(false);
     }
   };
 
@@ -55,11 +155,11 @@ export default function StepNavigation({ onSubmit }: StepNavigationProps) {
     resetForm();
   };
 
-  if (isLoading) {
+  if (isLoading || submitting) {
     return (
       <View style={styles.loadingContainer}>
         <ActivityIndicator size="large" color={theme.colors.primary} />
-        <Text style={styles.loadingText}>Loading saved form data...</Text>
+        <Text style={styles.loadingText}>{isLoading ? 'Loading saved form data...' : 'Submitting form data...'}</Text>
       </View>
     );
   }
